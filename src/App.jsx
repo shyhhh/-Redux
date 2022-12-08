@@ -22,7 +22,6 @@ const 二儿子 = () => (
   </section>
 );
 
-// data 里面拿到的 group
 const 幺儿子 = connect((state) => {
   return { group: state.group };
 })(({ group }) => {
@@ -40,9 +39,13 @@ const User = connect((state) => {
   return <div>User:{user.name}</div>;
 });
 
-const UserModifier = connect()(({ dispatch, state, children }) => {
+const UserModifier = connect(null, (dispatch) => {
+  return {
+    updateUser: (attrs) => dispatch({ type: "updateUser", payload: attrs }),
+  };
+})(({ updateUser, state, children }) => {
   const onChange = (e) => {
-    dispatch({ type: "updateUser", payload: { name: e.target.value } });
+    updateUser({ name: e.target.value });
   };
   return (
     <div>

@@ -21,9 +21,21 @@ const 二儿子 = () => (
     <UserModifier>内容</UserModifier>
   </section>
 );
-const 幺儿子 = () => <section>幺儿子</section>;
-const User = connect(state  => {
-  return { user: state.user }
+
+// data 里面拿到的 group
+const 幺儿子 = connect((state) => {
+  return { group: state.group };
+})(({ group }) => {
+  return (
+    <section>
+      大姐大
+      <div>Group: {group.name}</div>
+    </section>
+  );
+});
+
+const User = connect((state) => {
+  return { user: state.user };
 })(({ user }) => {
   return <div>User:{user.name}</div>;
 });

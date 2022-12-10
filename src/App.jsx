@@ -12,12 +12,12 @@ const reducer = (state, { type, payload }) => {
       },
     };
   }
-}
+};
 const initState = {
   user: { name: "hone", age: 18 },
-  group: {name: '哎呀呀'}
-}
-const store = createStore(reducer, initState)
+  group: { name: "哎呀呀" },
+};
+const store = createStore(reducer, initState);
 
 export const App = () => {
   return (
@@ -55,14 +55,30 @@ const 幺儿子 = connect((state) => {
 const User = connectToUser(({ user }) => {
   return <div>User:{user.name}</div>;
 });
-const UserModifier = connectToUser(({ updateUser, user, children }) => {
-  const onChange = (e) => {
-    updateUser({ name: e.target.value });
+const ajax = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve({ data: { name: "3秒后的hone" } });
+    }, 3000);
+  });
+};
+
+const fetchUser = (dispatch) => {
+  ajax("/user").then((response) => {
+    dispatch({ type: "updateUser", payload: response.data });
+  });
+};
+const UserModifier = connect(
+  null,
+  null
+)(({ state, dispatch }) => {
+  const onClick = (e) => {
+    dispatch(fetchUser);
   };
   return (
     <div>
-      {children}
-      <input value={user.name} onChange={onChange} />
+      <div>User: {state.user.name}</div>
+      <button onClick={onClick}>异步获取 user</button>
     </div>
   );
 });

@@ -20,9 +20,20 @@ const store = {
       const index = listeners.indexOf(fn);
       listeners.splice(index, 1);
     };
+  },
+};
+let dispatch = store.dispatch;
+
+const prevDispatch = dispatch;
+
+dispatch = (action) => {
+  if (action instanceof Function) {
+    action(dispatch);
+  } else {
+    prevDispatch(action); // 对象 type payload
   }
 };
-const dispatch = store.dispatch;
+
 export const createStore = (_reducer, initState) => {
   state = initState;
   reducer = _reducer;

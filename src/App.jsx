@@ -63,17 +63,21 @@ const ajax = () => {
   });
 };
 
-const fetchUser = (dispatch) => {
-  ajax("/user").then((response) => {
-    dispatch({ type: "updateUser", payload: response.data });
-  });
+const fetchUserPromise = async () => {
+  const response = await ajax('/user');
+  return response.data;
+}
+const fetchUser = async (dispatch) => {
+  const response = await ajax('/user');
+  return dispatch({ type: 'updateUser', payload: response.data });
 };
 const UserModifier = connect(
   null,
   null
 )(({ state, dispatch }) => {
   const onClick = (e) => {
-    dispatch(fetchUser);
+    dispatch({type: 'updateUser', payload: fetchUserPromise()})
+    // dispatch(fetchUser)
   };
   return (
     <div>

@@ -1,25 +1,31 @@
 import React, { useState, useContext, useEffect } from "react";
-
-const store = {
-  state: undefined,
-  reducer: undefined,
-  setState(newState) {
-    store.state = newState;
-    store.listeners.map((fn) => fn(store.state));
-  },
-  listeners: [],
-  subscribe(fn) {
-    store.listeners.push(fn);
-    return () => {
-      const index = store.listeners.indexOf(fn);
-      store.listeners.splice(index, 1);
-    };
-  },
+let state = undefined;
+let reducer = undefined;
+let listeners = [];
+const setState = (newState) => {
+  state = newState;
+  listeners.map((fn) => fn(state));
 };
 
-export const createStore = (reducer, initState) => {
-  store.state = initState;
-  store.reducer = reducer;
+const store = {
+  getState() {
+    return state;
+  },
+  dispatch: (action) => {
+    setState(reducer(state, action));
+  },
+  subscribe(fn) {
+    listeners.push(fn);
+    return () => {
+      const index = listeners.indexOf(fn);
+      listeners.splice(index, 1);
+    };
+  }
+};
+const dispatch = store.dispatch;
+export const createStore = (_reducer, initState) => {
+  state = initState;
+  reducer = _reducer;
   return store;
 };
 const changed = (oldState, newState) => {
@@ -33,23 +39,16 @@ const changed = (oldState, newState) => {
 };
 export const connect = (selector, dispatchSelector) => (Component) => {
   return (props) => {
-    const dispatch = (action) => {
-      setState(store.reducer(state, action));
-    };
-
-    const { state, setState } = useContext(appContext);
     const dispatchers = dispatchSelector
-    ? dispatchSelector(dispatch)
-    : { dispatch };
+      ? dispatchSelector(dispatch)
+      : { dispatch };
     const data = selector ? selector(state) : { state };
 
     const [, update] = useState({});
     useEffect(
       () =>
         store.subscribe(() => {
-          const newData = selector
-            ? selector(store.state)
-            : { state: store.state };
+          const newData = selector ? selector(state) : { state };
           if (changed(data, newData)) {
             update({});
           }
@@ -64,9 +63,5 @@ export const connect = (selector, dispatchSelector) => (Component) => {
 export const appContext = React.createContext(null);
 
 export const Provider = ({ store, children }) => {
-  return (
-    <appContext.Provider value={store}>
-      {children}
-    </appContext.Provider>
-  );
+  return <appContext.Provider value={store}>{children}</appContext.Provider>;
 };

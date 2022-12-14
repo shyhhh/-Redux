@@ -1,4 +1,6 @@
-# `yarn start`
+# 手写 Redux
+## 安装依赖
+`yarn install`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 启动 dev server
+`yarn start`
